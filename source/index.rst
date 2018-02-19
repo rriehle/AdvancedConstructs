@@ -41,9 +41,10 @@ Upon successful completion of this lesson, you will be able to:
 New Words or Concepts
 =====================
 
-* Multimethods
 * Decorator
 * Context Manager
+* Multimethods
+* Recursion
 
 
 Required Reading
