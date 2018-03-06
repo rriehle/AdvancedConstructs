@@ -84,6 +84,7 @@ Optional Reading
 * Decorators
 
   | https://wiki.python.org/moin/PythonDecorators
+  | https://dbader.org/blog/python-decorators
 
 * Context Managers
 
@@ -96,6 +97,159 @@ Content
 
 Decorator
 =========
+
+Functions are things that generate values based on arguments.  In Python functions are first-class objects.  This means that you can bind names to them, pass them around, etc., just like other objects.  Thanks to this you can write functions that take functions as arguments or return functions as values.
+
+.. code-block:: python
+
+    def substitute(a_function):
+        def new_function(*args, **kwargs):
+            return "I'm not that other function"
+        return new_function
+
+
+A Definition
+------------
+
+There are many things you can do with a simple pattern like this, so many, that we give it a special name: a Decorator.
+
+    "A decorator is a function that takes a function as an argument and
+    returns a function as a return value."
+
+That's nice, but why is it useful?
+
+Imagine you are trying to debug a module with a number of functions like this one:
+
+.. code-block:: python
+
+    def add(a, b):
+        return a + b
+
+You want to see when each function is called, with what arguments and
+with what result. So you rewrite each function as follows:
+
+.. code-block:: python
+
+    def add(a, b):
+        print("Function 'add' called with args: {}, {}".format(a, b) )
+        result = a + b
+        print("\tResult --> {}".format(result))
+        return result
+
+
+That is not particularly nice, especially if you have lots of functions
+in your module.  Now imagine we defined the following, more generic *decorator*:
+
+.. code-block:: python
+
+    def logged_func(func):
+        def logged(*args, **kwargs):
+            print("Function {} called".format(func.__name__))
+            if args:
+                print("\twith args: {}".format(args))
+            if kwargs:
+                print("\twith kwargs: {}".format(kwargs))
+            result = func(*args, **kwargs)
+            print("\t Result --> {}".format(result))
+            return result
+        return logged
+
+We could then make logging versions of our module functions.
+
+.. code-block:: python
+
+    logging_add = logged_func(add)
+
+Then, where we want to see the results, we can use the logged version:
+
+.. code-block:: ipython
+
+    In []: logging_add(3, 4)
+    Function 'add' called
+        with args: (3, 4)
+         Result --> 7
+    Out[]: 7
+
+
+This is nice, but we must now call the new function wherever we originally called the old one.  It would be nicer if we could just call the old function and have it log.  Remembering that you can easily rebind symbols in Python using simple assignment statements leads to this form:
+
+.. code-block:: python
+
+    def logged_func(func):
+        # implemented above
+
+    def add(a, b):
+        return a + b
+
+    add = logged_func(add)
+
+And now you can simply use the code you've already written and calls to ``add`` will be logged:
+
+.. code-block:: ipython
+
+    In []: add(3, 4)
+    Function 'add' called
+        with args: (3, 4)
+         Result --> 7
+    Out[]: 7
+
+
+Syntax
+------
+
+Rebinding the name of a function to the result of calling a decorator on that function is called **decoration**.  Because this is so common and useful, Python provides a special operator to perform it more *declaratively*: the ``@`` operator.
+
+.. code-block:: python
+
+    def add(a, b):
+        return a + b
+
+    # add = logged_func(add)
+
+    @logged_func
+    def add(a, b):
+        return a + b
+
+The declarative form (called a decorator expression) is more common, but both forms have the identical result and can be used interchangeably.
+
+.. code-block:: python
+
+    In [1]: def my_decorator(func):
+       ...:      def inner():
+       ...:          print('running inner')
+       ...:      return inner
+       ...:
+
+
+    In [2]: def other_func():
+       ...:     print('running other_func')
+
+    In [3]: other_func()
+    running other_func
+
+    In [4]: other_func = my_decorator(other_func)
+
+    In [5]: other_func()
+    In [5]: running inner
+
+    In [6]: other_func
+    Out[6]: <function __main__.my_decorator.<locals>.inner>
+
+Which is the same as:
+
+.. code-block:: python
+
+
+    In [7]: @my_decorator
+       ...: def other_func():
+       ...:      print('running other_func')
+       ...:
+
+    In [8]: other_func()
+    running inner
+
+    In [9]: other_func
+    Out[9]: <function __main__.my_decorator.<locals>.inner>
 
 
 Context Manager
@@ -119,7 +273,8 @@ Recursive algorithms naturally fit certain problems, particularly problems amena
 
 A key element to a recursive solution involves the specification of a termination condition.  The algorithm needs to know when to end, when to stop calling itself.  Typically this is when all of the members of the collection have been processed.
 
-[Video]
+[Video: Recursion]
+
 
 Recursion Limitations
 ---------------------
@@ -140,6 +295,7 @@ The Python interpreter by default limits the number of recursive calls --- the n
     sys.setrecursionlimit(5000)
 
 Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
+
 
 Summary
 -------
