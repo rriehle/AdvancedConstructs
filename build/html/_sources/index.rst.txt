@@ -153,8 +153,22 @@ An astute observer might point out that by storing information on the stack, in 
 Quiz
 ****
 
-# What conditions are necessary for a successful recursive algorithm?
-  # A termination condition.
+1.
+
+2.
+
+3.
+
+4. What conditions are necessary for a successful recursive algorithm?
+
+   |
+   | A termination condition.
+
+5. When developing recursive solutions in Python it is important to be aware of what?
+
+   | How many and which other functions will call your recursive function.
+   | Your tail call elimination strategy.
+   | The mutability of your function arguments and the depth of the call stack.
 
 
 ********
