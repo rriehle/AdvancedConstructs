@@ -38,8 +38,10 @@ Learning Objectives
 
 Upon successful completion of this lesson, you will be able to:
 
+* construct decorators
 *
-*
+* design and code a recursive algorithm
+* articulate the drawbacks of recursion in Python
 
 
 New Words or Concepts
@@ -48,7 +50,7 @@ New Words or Concepts
 * Decorator
 * Context Manager
 * Contextlib
-* Multimethods
+.. * Multimethods
 * Recursion
 
 
@@ -64,10 +66,10 @@ Required Reading
   | `https://docs.python.org/3/library/stdtypes.html#typecontextmanager https://docs.python.org/3/library/stdtypes.html#typecontextmanager>`_
   | https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
-* Multimethods
+.. * Multimethods
 
-  | Five-minute Multimethods in Python by Guido van van Rossum
-  | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
+..   | Five-minute Multimethods in Python by Guido van van Rossum
+..   | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
 
 * Recursion
 
@@ -89,6 +91,11 @@ Optional Reading
 * Context Managers
 
   | https://docs.python.org/3/library/contextlib.html
+  | https://www.python.org/dev/peps/pep-0343/
+
+* Recursion
+
+  | https://pointlessprogramming.wordpress.com/tag/tail-call-optimization/
 
 
 *******
@@ -108,17 +115,11 @@ Functions are things that generate values based on arguments.  In Python functio
         return new_function
 
 
-A Definition
-------------
-
 There are many things you can do with a simple pattern like this, so many, that we give it a special name: a Decorator.
 
-    "A decorator is a function that takes a function as an argument and
-    returns a function as a return value."
+    "A decorator is a function that takes a function as an argument and returns a function as a return value."
 
-That's nice, but why is it useful?
-
-Imagine you are trying to debug a module with a number of functions like this one:
+That's nice, but why is it useful?  Imagine you are trying to debug a module with a number of functions like this one:
 
 .. code-block:: python
 
@@ -255,6 +256,45 @@ Which is the same as:
 Context Manager
 ===============
 
+:download:`context_manager.py <../examples/context_managers/context_manager.py>`
+
+:download:`file_yielder.py <../examples/context_managers/file_yielder.py>`
+
+Mixing context_managers with generators
+---------------------------------------
+
+You can put a ``yield`` inside a context manager as well.
+
+here is a generator function that gives yields all the files in a directory:
+
+.. code-block:: python
+
+import pathlib
+
+def file_yielder(dir=".", pattern="*"):
+"""
+iterate over all the files that match the pattern
+
+pattern us a "glob" pattern, like: *.py
+"""
+for filename in pathlib.Path(dir).glob(pattern):
+with open(filename) as file_obj:
+yield file_obj
+
+:download:`file_yielder.py <../examples/context_managers/file_yielder.py>`
+
+So the ``yield`` is inside the file context manager, so that state will be preserved while the file object is in use.
+
+This generator can be used like so:
+
+.. code-block:: ipython
+
+In [20]: for f in file_yielder(pattern="*.py"):
+...: print("The first line of: {} is:\n{}".format(f.name, f.readline()))
+
+Each iteration through the loop, the previous file gets closed, and the new one opened. If there is an exception raised inside that loop, the last file will get properly closed.
+
+
 
 Multimethods
 ============
@@ -296,40 +336,49 @@ The Python interpreter by default limits the number of recursive calls --- the n
 
 Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
 
+An astute observer might point out that by storing information on the stack, in successive stack frames, we are storing state.  Are we not?  Yes and no.  The data stored on the stack during the execution of most recursive algorithms become the return values from or the arguments to successive function calls.  This results in a natural composition of functions, but rather than the composition of different functions, for instance g(f(x)) which is the way we normally think about functional composition, recursive algorithms represent the composition of a function with itself: f(f(x)).
+
 
 Summary
 -------
 
-Recursion is generally considered a functional programming technique partly because it grew up in functional programming languages such as Lisp and Scheme, and also because it tends to satisfy the functional objective of avoiding state and thus the mapping of one set of inputs to a single, determinate output.
-
-An astute observer might point out that by storing information on the stack, in successive stack frames, we are storing state.  Are we not?  Yes and no.  The data stored on the stack during the execution of most recursive algorithms become the return values from or the arguments to successive function calls.  This results in a natural composition of functions, but rather than the composition of different functions, for instance g(f(x)) which is the way we normally think about functional composition, recursive algorithms represent the composition of a function with itself: f(f(x)).
+Recursion is generally considered a functional programming technique partly because it grew up in functional programming languages such as Lisp and Scheme, yet also because it tends to satisfy the functional objective of avoiding state and thus the mapping of one set of inputs to a single, determinate output.
 
 
 ****
 Quiz
 ****
 
-1.
+1. Decorators rely on Python's ability to
+
+   | Pass functions to other functions
+   | Return functions from functions
+   | Rebind function names to new or different functions
+
 
 2.
 
 3.
 
-4. What conditions are necessary for a successful recursive algorithm?
+4. What condition is necessary for a successful recursive algorithm?
 
-   |
-   | A termination condition.
+   | Pep8 compliance
+   | A conditional condition
+   | Mutable arguments
+   | A termination condition
 
 5. When developing recursive solutions in Python it is important to be aware of what?
 
    | How many and which other functions will call your recursive function.
    | Your tail call elimination strategy.
+   | of what? of what? of what? of what? of what?
    | The mutability of your function arguments and the depth of the call stack.
 
 
-********
-Activity
-********
+*********************
+Activity & Assignment
+*********************
+
 
 Recursion
 =========
@@ -339,9 +388,6 @@ Write a recursive solution for the factorial function.
 https://en.wikipedia.org/wiki/Factorial
 
 
-**********
-Assignment
-**********
 
 
 
