@@ -39,7 +39,7 @@ Learning Objectives
 Upon successful completion of this lesson, you will be able to:
 
 * construct decorators
-*
+* use context managers
 * design and code a recursive algorithm
 * articulate the drawbacks of recursion in Python
 
@@ -50,7 +50,8 @@ New Words or Concepts
 * Decorator
 * Context Manager
 * Contextlib
-.. * Multimethods
+* Multiple Dispatch
+* Multimethods
 * Recursion
 
 
@@ -66,10 +67,11 @@ Required Reading
   | `https://docs.python.org/3/library/stdtypes.html#typecontextmanager https://docs.python.org/3/library/stdtypes.html#typecontextmanager>`_
   | https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
-.. * Multimethods
+* Multiple Dispatch & Multimethods
 
-..   | Five-minute Multimethods in Python by Guido van van Rossum
-..   | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
+  | Five-minute Multimethods in Python by Guido van van Rossum
+  | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
+  | https://en.wikipedia.org/wiki/Multiple_dispatch
 
 * Recursion
 
@@ -289,19 +291,24 @@ This generator can be used like so:
 
 .. code-block:: ipython
 
-In [20]: for f in file_yielder(pattern="*.py"):
-...: print("The first line of: {} is:\n{}".format(f.name, f.readline()))
+    In [20]: for f in file_yielder(pattern="*.py"):
+        print("The first line of: {} is:\n{}".format(f.name, f.readline()))
 
 Each iteration through the loop, the previous file gets closed, and the new one opened. If there is an exception raised inside that loop, the last file will get properly closed.
 
 
+Multiple Dispatch & Multimethods
+================================
 
-Multimethods
-============
+.. https://canvas.uw.edu/courses/1212062/pages/lesson-02-dot-02-currying?module_item_id=8222029
+.. https://www.artima.com/forums/flat.jsp?forum=106&thread=101605
+.. https://stackoverflow.com/questions/14858192/force-a-function-parameter-type-in-python
+.. https://gist.github.com/bcse/1443027
+.. https://eli.thegreenplace.net/tag/multiple-dispatch
+.. https://dzone.com/articles/a-polyglots-guide-to-multiple-dispatch-part-ii
+.. https://pypi.python.org/pypi/multimethod/0.6
+.. https://bitbucket.org/coady/multimethod
 
-
-Polymorphism
-------------
 
 
 Recursion
@@ -356,7 +363,12 @@ Quiz
    | Rebind function names to new or different functions
 
 
-2.
+2. Context managers facilitate what types of problems?
+
+   | Resource management
+   | Opening and closing file handles and database cursors
+   |
+
 
 3.
 
