@@ -55,6 +55,7 @@
 <li><a class="reference internal" href="#context-manager">Context Manager</a><ul>
 <li><a class="reference internal" href="#contextlib">contextlib</a></li>
 <li><a class="reference internal" href="#enter-and-exit">Enter and exit</a></li>
+<li><a class="reference internal" href="#the-contextmanager-decorator">The contextmanager decorator</a></li>
 <li><a class="reference internal" href="#mixing-context-managers-with-generators">Mixing context_managers with generators</a></li>
 </ul>
 </li>
@@ -68,7 +69,7 @@
 </li>
 <li><a class="reference internal" href="#quiz">Quiz</a></li>
 <li><a class="reference internal" href="#activity-assignment">Activity &amp; Assignment</a><ul>
-<li><a class="reference internal" href="#id3">Recursion</a></li>
+<li><a class="reference internal" href="#id1">Recursion</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -148,7 +149,7 @@
 </li>
 <li><p class="first">Context Managers</p>
 <div class="line-block">
-<div class="line"><a href="#id4"><span class="problematic" id="id5">`https://docs.python.org/3/library/stdtypes.html#typecontextmanager https://docs.python.org/3/library/stdtypes.html#typecontextmanager&gt;`_</span></a></div>
+<div class="line"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#typecontextmanager">https://docs.python.org/3/library/stdtypes.html#typecontextmanager</a></div>
 <div class="line"><a class="reference external" href="https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/">https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/</a></div>
 </div>
 </li>
@@ -447,32 +448,81 @@ clarify the order in which things happen:</p>
 <p>The value is the exception object itself.</p>
 <p>And the traceback is a full traceback object.  Traceback objects hold all the information about the context in which and error occurred.  It’s pretty advanced stuff, so you can mostly ignore it, but if you want to know more, there are tools for working with them in the <code class="docutils literal"><span class="pre">traceback</span></code> module.</p>
 <p><a class="reference external" href="https://docs.python.org/3/library/traceback.html">https://docs.python.org/3/library/traceback.html</a></p>
-<p><a class="reference download internal" href="_downloads/file_yielder.py" download=""><code class="xref download docutils literal"><span class="pre">file_yielder.py</span></code></a></p>
+</div>
+<div class="section" id="the-contextmanager-decorator">
+<h4>The contextmanager decorator<a class="headerlink" href="#the-contextmanager-decorator" title="Permalink to this headline">¶</a></h4>
+<p>Similar to writing iterable classes, there’s a fair bit of bookkeeping involved.  It turns out you can take advantage of generator functions to do that bookkeeping for you.  The <code class="docutils literal"><span class="pre">contextlib.contextmanager</span></code> decorator will turn a generator function into context manager.  Consider this code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="n">boolean</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;__init__ code here&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;__enter__ code goes here&quot;</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="nb">object</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;errors handled here&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">boolean</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;__exit__ cleanup goes here&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The code is similar to the class defined previously and using it has similar results.  We can handle errors.</p>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [96]: </span><span class="k">with</span> <span class="n">context</span><span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+<span class="gp">   ....: </span>    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;in the context&quot;</span><span class="p">)</span>
+<span class="gp">   ....: </span>    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;error raised&quot;</span><span class="p">)</span>
+<span class="gp">   ....:</span>
+<span class="go">__init__ code here</span>
+<span class="go">__enter__ code goes here</span>
+<span class="go">in the context</span>
+<span class="go">errors handled here</span>
+<span class="go">__exit__ cleanup goes here</span>
+</pre></div>
+</div>
+<p>Or, we can allow them to propagate:</p>
+<div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [51]: </span><span class="k">with</span> <span class="n">context</span><span class="p">(</span><span class="bp">False</span><span class="p">):</span>
+<span class="gp">   ....: </span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;in the context&quot;</span><span class="p">)</span>
+<span class="gp">   ....: </span><span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;error raised&quot;</span><span class="p">)</span>
+<span class="go">__init__ code here</span>
+<span class="go">__enter__ code goes here</span>
+<span class="go">in the context</span>
+<span class="go">errors handled here</span>
+<span class="go">__exit__ cleanup goes here</span>
+<span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
+<span class="nn">&lt;ipython-input-51-641528ffa695&gt;</span> in <span class="ni">&lt;module&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="k">with</span> <span class="n">context</span><span class="p">(</span><span class="bp">False</span><span class="p">):</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="k">print</span> <span class="s2">&quot;in the context&quot;</span>
+<span class="ne">----&gt; </span><span class="mi">3</span>     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;error raised&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>
+<span class="ne">RuntimeError</span>: error raised
+</pre></div>
+</div>
 </div>
 <div class="section" id="mixing-context-managers-with-generators">
 <h4>Mixing context_managers with generators<a class="headerlink" href="#mixing-context-managers-with-generators" title="Permalink to this headline">¶</a></h4>
-<p>You can put a <code class="docutils literal"><span class="pre">yield</span></code> inside a context manager as well.</p>
-<p>here is a generator function that gives yields all the files in a directory:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>
+<p>You can put a <code class="docutils literal"><span class="pre">yield</span></code> inside a context manager as well.  Here is a generator function that gives yields all the files in a directory.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="k">def</span> <span class="nf">file_yielder</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    iterate over all the files that match the pattern</span>
+
+<span class="sd">    pattern us a &quot;glob&quot; pattern, like: *.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_obj</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">file_obj</span>
 </pre></div>
 </div>
-<p>import pathlib</p>
-<p>def file_yielder(dir=”.”, pattern=”*”):
-“””
-iterate over all the files that match the pattern</p>
-<p>pattern us a “glob” pattern, like: <a href="#id1"><span class="problematic" id="id2">*</span></a>.py
-“””
-for filename in pathlib.Path(dir).glob(pattern):
-with open(filename) as file_obj:
-yield file_obj</p>
 <p><a class="reference download internal" href="_downloads/file_yielder.py" download=""><code class="xref download docutils literal"><span class="pre">file_yielder.py</span></code></a></p>
-<p>So the <code class="docutils literal"><span class="pre">yield</span></code> is inside the file context manager, so that state will be preserved while the file object is in use.</p>
-<p>This generator can be used like so:</p>
+<p>The <code class="docutils literal"><span class="pre">yield</span></code> is inside the file context manager, so that state will be preserved while the file object is in use.  This generator can be used as follows.</p>
 <div class="highlight-ipython"><div class="highlight"><pre><span></span><span class="gp">In [20]: </span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_yielder</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;*.py&quot;</span><span class="p">):</span>
-<span class="go">    print(&quot;The first line of: {} is:\n{}&quot;.format(f.name, f.readline()))</span>
+<span class="go">    ...:     print(&quot;The first line of: {} is:\n{}&quot;.format(f.name, f.readline()))</span>
 </pre></div>
 </div>
-<p>Each iteration through the loop, the previous file gets closed, and the new one opened. If there is an exception raised inside that loop, the last file will get properly closed.</p>
+<p>In each iteration through the loop the previous file gets closed and the new one opened.  If there is an exception raised inside the loop, the last file will get properly closed.</p>
 </div>
 </div>
 <div class="section" id="multiple-dispatch-multimethods">
@@ -550,8 +600,8 @@ yield file_obj</p>
 </div>
 <div class="section" id="activity-assignment">
 <h2>Activity &amp; Assignment<a class="headerlink" href="#activity-assignment" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id3">
-<h3>Recursion<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Recursion<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>Write a recursive solution for the factorial function.</p>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Factorial">https://en.wikipedia.org/wiki/Factorial</a></p>
 </div>
