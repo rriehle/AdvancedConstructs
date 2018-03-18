@@ -492,7 +492,7 @@ Python is not ideally suited to recursive programming for a few key reasons:
 
 An astute observer might point out that by storing information on the stack, in successive stack frames, we are storing state, and that this is counter to functional programming's aversion to mutable state and its attraction to functional purity.  Are we or are we not?  The data stored on the stack during the execution of most recursive algorithms become the return values from and the arguments to successive function calls.  This results in a natural composition of functions, but rather than the composition of different functions, for instance ``g(f(x))`` which is the way we normally think about functional composition, recursive algorithms represent the composition of a function with itself: ``f(f(x))``.  Provided we are using immutable data structures in our calls, or provided we are careful not to mutate values between successive recursive calls, recursion should work.
 
-2.  The Python interpreter by default limits the number of recursive calls --- the number of calls a function can make to itself --- to 1000.  This value can be changed at runtime, but if you find you have large data sets to process you may need to consider a non-recursive strategy.  To increase the number of stack frames available to a recursive algorithm, use sys.setrecursionlimit as follows:
+2.  The Python interpreter by default has its stackframe limit set to 1000.  This value can be changed at runtime, but if you find you have large data sets to process you may need to consider a non-recursive strategy.  To increase the number of stack frames use sys.setrecursionlimit as follows:
 
 .. code-block:: python3
 
