@@ -258,7 +258,172 @@ Which is the same as:
 Context Manager
 ===============
 
+We have seen the ``with`` statement --- probably used when working with files.  It is associated with resource management, but let's work our way there.
+
+A large source of repetition in code deals with the handling of external
+resources.  As an example, how many times do you think you might type something like the following:
+
+.. code-block:: python
+
+    file_handle = open('filename.txt', 'r')
+    file_content = file_handle.read()
+    file_handle.close()
+    # do some stuff with the contents
+
+Resource management is roughly half of that code and it is also prone to error.
+
+* What happens if you forget to call ``.close()``?
+
+* What happens if reading the file raises an exception?
+
+Perhaps we should write it something like:
+
+.. code-block:: python
+
+    try:
+        file_handle = open(...)
+        file_content = file_handle.read()
+    except IOError:
+        print("The file couldn't be opened")
+    finally:
+        file_handle.close()
+
+That is getting ugly, and hard to get right.  Should we do the read inside the try or only the open?  Should the read get its own try?  Leaving an open file handle laying around is bad enough.  What if the resource is a network connection, or a database cursor?
+
+Starting in version 2.5, Python provides a structure called a *context manager* for reducing repetition and avoiding errors associated with handling resources.  They encapsulate the setup, error handling, and tear down of resources in a few steps.  The key is to use the ``with`` statement.
+
+Since the introduction of the ``with`` statement in `PEP 343 <https://www.python.org/dev/peps/pep-0343/>`_, the above seven lines of defensive code have been replaced with this simple form:
+
+.. code-block:: python
+
+    with open('filename', 'r') as file_handle:
+        file_content = file_handle.read()
+    # do something with file_content
+
+The ``open`` builtin is defined as a *context manager*.  The resource it returns (``file_handle``) is automatically and reliably closed when the code block ends.  At this point in Python's evolution, many functions you might expect to behave this way, in fact, do:
+
+* file handling with ``open``
+* network connections via ``socket``
+* most implementations of database wrappers handle connections or cursors as context managers
+
+But what if you are working with a library that doesn't support this, for instance ``urllib``?
+
+contextlib
+----------
+
+If the resource in questions has a ``.close()`` method, then you can simply use the ``closing`` context manager from ``contextlib`` to handle the issue:
+
+.. code-block:: python
+
+    from urllib import request
+    from contextlib import closing
+
+    with closing(request.urlopen('http://google.com')) as web_connection:
+        # do something with the open resource
+    # and by here it will be closed automatically
+
+But what if the thing doesn't have a ``close()`` method, or you're creating
+the thing yourself and it shouldn't have a close() method?
+
+(Full confession: urlib.request was not a context manager in py2 --- but it is in py3.  Nonetheless the issue still comes up with third-party packages and of course in your own code.)
+
+Enter ``__enter__`` and ``__exit__``
+------------------------------------
+
+If you do need to support resource management of some sort, you can write a context manager of your own by implementing the context manager protocol.  The interface is simple.  It must be a class that implements two of the nifty python *special methods*
+
+``__enter__(self)``:
+  Called when the ``with`` statement is run, it should return something to work with in the created context.
+
+``__exit__(self, e_type, e_val, e_traceback)``:
+  Clean-up that needs to happen is implemented here.
+
+Let's see this in action to get a sense of what happens.  Consider this code:
+
+.. code-block:: python
+
+    class Context(object):
+        """from Doug Hellmann, PyMOTW
+        https://pymotw.com/3/contextlib/#module-contextlib
+        """
+        def __init__(self, handle_error):
+            print('__init__({})'.format(handle_error))
+            self.handle_error = handle_error
+
+        def __enter__(self):
+            print('__enter__()')
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            print('__exit__({}, {}, {})'.format(exc_type, exc_val, exc_tb))
+            return self.handle_error
+
 :download:`context_manager.py <../examples/context_managers/context_manager.py>`
+
+This class doesn't do much of anything, but playing with it can help
+clarify the order in which things happen:
+
+.. code-block:: ipython
+
+    In [2]: %paste
+        In [46]: with Context(True) as foo:
+           ....:     print('This is in the context')
+           ....:     raise RuntimeError('this is the error message')
+
+    ## -- End pasted text --
+    __init__(True)
+    __enter__()
+    This is in the context
+    __exit__(<class 'RuntimeError'>, this is the error message,
+             <traceback object at 0x1047873c8>)
+
+Because the ``__exit__`` method returns ``True``, the raised error is handled.  What if we try with ``False``?
+
+.. code-block:: ipython
+
+    In [3]: with Context(False) as foo:
+       ...:     print("this is in the context")
+       ...:     raise RuntimeError('this is the error message')
+       ...:
+    __init__(False)
+    __enter__()
+    this is in the context
+    __exit__(<class 'RuntimeError'>, this is the error message, <traceback object at 0x10349e888>)
+    ---------------------------------------------------------------------------
+    RuntimeError                              Traceback (most recent call last)
+    <ipython-input-3-8837b3d7f123> in <module>()
+          1 with Context(False) as foo:
+          2     print("this is in the context")
+    ----> 3     raise RuntimeError('this is the error message')
+
+    RuntimeError: this is the error message
+
+This time the context manager did not catch the error --- so it was raised the in the usual way.  In real life a context manager could have pretty much any error raised in its context and the context manager will likely only be able to properly handle particular Exceptions, thus the ``__exit__`` method takes all the information about the exception as parameters.
+
+``def __exit__(self, exc_type, exc_val, exc_tb)``
+
+``exc_type``: the type of the Exception
+
+``exc_val``: the value of the Exception
+
+``exc_tb``: the Exception Traceback object
+
+The lets you check if this is a type you know how to handle.
+
+.. code-block:: python
+
+    if exc_type is RuntimeError:
+
+The value is the exception object itself.
+
+And the traceback is a full traceback object.  Traceback objects hold all the information about the context in which and error occurred.  It's pretty advanced stuff, so you can mostly ignore it, but if you want to know more, there are tools for working with them in the ``traceback`` module.
+
+https://docs.python.org/3/library/traceback.html
+
+
+
+
+
 
 :download:`file_yielder.py <../examples/context_managers/file_yielder.py>`
 
@@ -342,7 +507,6 @@ An astute observer might point out that by storing information on the stack, in 
     sys.setrecursionlimit(5000)
 
 3.  Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
-
 
 
 Summary
