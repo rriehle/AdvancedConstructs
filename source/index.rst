@@ -320,8 +320,6 @@ Recursive algorithms naturally fit certain problems, particularly problems amena
 
 A key element to a recursive solution involves the specification of a termination condition.  The algorithm needs to know when to end, when to stop calling itself.  Typically this is when all of the members of the collection have been processed.
 
-[Video: Recursion]
-
 
 Recursion Limitations
 ---------------------
