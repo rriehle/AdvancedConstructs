@@ -54,7 +54,7 @@
 </li>
 <li><a class="reference internal" href="#context-manager">Context Manager</a><ul>
 <li><a class="reference internal" href="#contextlib">contextlib</a></li>
-<li><a class="reference internal" href="#enter-enter-and-exit">Enter <code class="docutils literal"><span class="pre">__enter__</span></code> and <code class="docutils literal"><span class="pre">__exit__</span></code></a></li>
+<li><a class="reference internal" href="#enter-and-exit">Enter and exit</a></li>
 <li><a class="reference internal" href="#mixing-context-managers-with-generators">Mixing context_managers with generators</a></li>
 </ul>
 </li>
@@ -373,8 +373,8 @@ resources.  As an example, how many times do you think you might type something 
 the thing yourself and it shouldn’t have a close() method?</p>
 <p>(Full confession: urlib.request was not a context manager in py2 — but it is in py3.  Nonetheless the issue still comes up with third-party packages and of course in your own code.)</p>
 </div>
-<div class="section" id="enter-enter-and-exit">
-<h4>Enter <code class="docutils literal"><span class="pre">__enter__</span></code> and <code class="docutils literal"><span class="pre">__exit__</span></code><a class="headerlink" href="#enter-enter-and-exit" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="enter-and-exit">
+<h4>Enter and exit<a class="headerlink" href="#enter-and-exit" title="Permalink to this headline">¶</a></h4>
 <p>If you do need to support resource management of some sort, you can write a context manager of your own by implementing the context manager protocol.  The interface is simple.  It must be a class that implements two of the nifty python <em>special methods</em></p>
 <dl class="docutils">
 <dt><code class="docutils literal"><span class="pre">__enter__(self)</span></code>:</dt>

@@ -327,8 +327,8 @@ the thing yourself and it shouldn't have a close() method?
 
 (Full confession: urlib.request was not a context manager in py2 --- but it is in py3.  Nonetheless the issue still comes up with third-party packages and of course in your own code.)
 
-Enter ``__enter__`` and ``__exit__``
-------------------------------------
+Enter and exit
+--------------
 
 If you do need to support resource management of some sort, you can write a context manager of your own by implementing the context manager protocol.  The interface is simple.  It must be a class that implements two of the nifty python *special methods*
 
