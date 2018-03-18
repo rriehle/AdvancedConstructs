@@ -348,7 +348,7 @@ An astute observer might point out that by storing information on the stack, in 
 Summary
 -------
 
-Recursion is generally considered a functional programming technique partly because it grew up in functional programming languages such as Lisp and Scheme, yet also because it tends to satisfy the functional objective of avoiding state and thus the mapping of one set of inputs to a single, determinate output.
+Recursion is generally considered a functional programming technique partly because it grew up in functional programming languages such as Lisp and Scheme, yet also because it tends to satisfy the functional objective of avoiding state and thus the mapping of one set of inputs to a single, determinate output.  It is a natural way to express many core algorithms having to do with sequences and tree structures, both of which pervade programming.  It has its limitations in Python, but is worth understanding and using nonetheless.
 
 
 ****
