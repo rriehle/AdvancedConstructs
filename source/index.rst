@@ -420,13 +420,6 @@ And the traceback is a full traceback object.  Traceback objects hold all the in
 
 https://docs.python.org/3/library/traceback.html
 
-
-
-
-
-
-:download:`file_yielder.py <../examples/context_managers/file_yielder.py>`
-
 Mixing context_managers with generators
 ---------------------------------------
 
