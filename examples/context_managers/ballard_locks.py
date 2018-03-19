@@ -21,8 +21,8 @@ class Locke(object):
 
     def __exit__(self, *args):
         print("In __exit__(): Stopping the pumps")
-        print("In __exit__(): opening the doors.")
-        print("In __exit__(): Closing the doors.")
+        print("In __exit__(): Opening the other doors.")
+        print("In __exit__(): Closing the other doors.")
         print("In __exit__(): Starting the pumps")
 
     def move_boats_through(self, num_boats=0):
