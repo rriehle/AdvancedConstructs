@@ -620,10 +620,12 @@ As an early design decision you have decided to avoid overloading the term lock,
 
 Write a context manager class ``Locke`` to simulate the overall functioning of the system.  When the locke is entered it stops the pumps, opens the doors, closes the doors, and restarts the pumps.  Likewise when the locke is exited it runs through the same steps: it stops the pumps, opens the doors, closes the doors, and restarts the pumps.  Don't worry for now that in the real world there are both upstream and downstream doors; perhaps you'll get to that later.  During initialization the context manger class it accepts its capacity in number of boats.  If someone tries to move too many boats through the locke, anything over its established capacity, raise a suitable error.  Since this is a simulation you need do nothing more than print what is happening with the doors and pumps, like this:
 
-| "Stopping the pumps."
-| "Opening the doors."
-| "Closing the doors."
-| "Restarting the pumps."
+.. code-block:: bash
+
+    "Stopping the pumps."
+    "Opening the doors."
+    "Closing the doors."
+    "Restarting the pumps."
 
 This is how you might interact with your Locke class.
 
