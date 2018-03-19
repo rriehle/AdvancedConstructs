@@ -504,7 +504,7 @@ The Python interpreter by default has its stackframe limit set to 1000.  This va
 Lack of Tail Call Optimization or Elimination
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
+Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal Python stack traces.
 
 
 Summary
@@ -528,8 +528,9 @@ Quiz
 
    | Resource management
    | Opening and closing file handles and database cursors
-   |
-
+   | Inheritance in the context of multiple parent classes
+   | The opening and closing of closures
+   | Determining the call sequence of nested decorators
 
 3.
 
@@ -551,6 +552,36 @@ Quiz
 *********************
 Activity & Assignment
 *********************
+
+Context Managers
+================
+
+The `Ballard Lockes https://en.wikipedia.org/wiki/Ballard_Locks>`_ in Seattle, Washington are a limited, controlled resource.  You have been hired by the Army Corps of Engineers to help build a software control system for the lockes.  There are two lockes at the locke complex, one small (30 x 150 feet, 8.5 x 45.7 meter) and one large (80 x 825 feet, 24.4 x 251.5 meter).  There are myriad ways in which different components of the lockees represent limited resources with specialized subsystems, and a missed or out-of-sequence step could mean disaster.  For instance, there are two sets of doors for each locke, one upstream and one down, that cannot both be open at the same time; boats need to clear the doors before they are closed, sealed and locked; pumps need to be shut down before locke doors are opened; observing tourists who can get very close to the action need to be safely managed; the lockes themselves can only handle a certain number of boats.  At every step of the way there is a limited resource that must be managed and in step with the others.  In effect it involves the tight management of resources all the way down.
+
+For this first task you do not need to model every aspect of the locks, indeed only need to model its operation overall.  Early on you learn that there will be other software developers interacting with the system and that not everyone is going to remember all the details of using the resources of each component.  Your task is to make the use of the components as simple as possible, so that other developers don't need to remember all of the steps associated with each component's use.  You think to yourself that this is a good environment for context managers and so this is how you will model the overall functioning.
+
+As an early design decision you have decided to avoid overloading the term lock, which in the context can be interpreted both as a verb and as a noun and thereby cause confusion.  For any instances of the verb you will use its usual spelling: lock.  For any instances of the noun you will use an alternative spelling: locke.
+
+Write a context manager class ``Locke`` to simulate the overall functioning of the system.  When the locke is entered it stops the pumps, opens the doors, closes the doors, and restarts the pumps.  Likewise when the locke is exited it runs through the same steps: it stops the pumps, opens the doors, closes the doors, and restarts the pumps.  Don't worry for now that in the real world there are both upstream and downstream doors; perhaps you'll get to that later.  During initialization the context manger class it accepts its capacity in number of boats.  If someone tries to move too many boats through the locke, anything over its established capacity, raise a suitable error.  Since this is a simulation you need do nothing more than print what is happening with the doors and pumps, like this:
+
+| "Stopping the pumps."
+| "Opening the doors."
+| "Closing the doors."
+| "Restarting the pumps."
+
+.. code-block:: python3
+
+    small_locke = Locke(5)
+    large_locke = Locke(10)
+    boats = 8
+
+    # Too many boats through a small locke will raise an exception
+    with small_locke as locke:
+        locke.move_boats_through(boats)
+
+    # A lock with sufficient capacity can move boats without incident.
+    with large_locke as locke:
+        locke.move_boats_through(boats)
 
 
 Recursion
