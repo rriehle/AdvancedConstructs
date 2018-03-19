@@ -569,6 +569,8 @@ Write a context manager class ``Locke`` to simulate the overall functioning of t
 | "Closing the doors."
 | "Restarting the pumps."
 
+This is how you might interact with your Locke class.
+
 .. code-block:: python3
 
     small_locke = Locke(5)
