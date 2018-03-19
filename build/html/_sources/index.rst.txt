@@ -420,6 +420,7 @@ And the traceback is a full traceback object.  Traceback objects hold all the in
 
 https://docs.python.org/3/library/traceback.html
 
+<<<<<<< HEAD
 The contextmanager decorator
 ----------------------------
 
@@ -477,6 +478,8 @@ Or, we can allow them to propagate:
           4
     RuntimeError: error raised
 
+=======
+>>>>>>> rriehle
 Mixing context_managers with generators
 ---------------------------------------
 
@@ -535,24 +538,29 @@ A key element to a recursive solution involves the specification of a terminatio
 Recursion Limitations
 ---------------------
 
-Python is not ideally suited to recursive programming for a few key reasons:
+Python is not ideally suited to recursive programming for a few key reasons.
 
-1.  mutable data structures
-2.  stackframe limits
-3.  lack of tail call optimization or elimination
+mutable data structures
+^^^^^^^^^^^^^^^^^^^^^^^
 
-1.  Python's workhorse data structure is the list and recursive solutions on list-like sequences can be attractive.  However, Python lists are mutable and when mutable data structures are passed as arguments to functions they can be changed, affecting their value both inside and outside of the called function.  Clean and natural-looking recursive algorithms generally assume that values do not change between recursive calls and generally fail if they do.  Attempts to avoid this problem, say by making copies of the mutable data structure to pass at each successive recursive call, can be expensive both computationally and in terms of memory consumption.  Beware this scenario when designing and debugging recursive functions.
+Python's workhorse data structure is the list and recursive solutions on list-like sequences can be attractive.  However, Python lists are mutable and when mutable data structures are passed as arguments to functions they can be changed, affecting their value both inside and outside of the called function.  Clean and natural-looking recursive algorithms generally assume that values do not change between recursive calls and generally fail if they do.  Attempts to avoid this problem, say by making copies of the mutable data structure to pass at each successive recursive call, can be expensive both computationally and in terms of memory consumption.  Beware this scenario when designing and debugging recursive functions.
 
 An astute observer might point out that by storing information on the stack, in successive stack frames, we are storing state, and that this is counter to functional programming's aversion to mutable state and its attraction to functional purity.  Are we or are we not?  The data stored on the stack during the execution of most recursive algorithms become the return values from and the arguments to successive function calls.  This results in a natural composition of functions, but rather than the composition of different functions, for instance ``g(f(x))`` which is the way we normally think about functional composition, recursive algorithms represent the composition of a function with itself: ``f(f(x))``.  Provided we are using immutable data structures in our calls, or provided we are careful not to mutate values between successive recursive calls, recursion should work.
 
-2.  The Python interpreter by default limits the number of recursive calls --- the number of calls a function can make to itself --- to 1000.  This value can be changed at runtime, but if you find you have large data sets to process you may need to consider a non-recursive strategy.  To increase the number of stack frames available to a recursive algorithm, use sys.setrecursionlimit as follows:
+stackframe limits
+^^^^^^^^^^^^^^^^^
+
+The Python interpreter by default has its stackframe limit set to 1000.  This value can be changed at runtime, but if you find you have large data sets to process you may need to consider a non-recursive strategy.  To increase the number of stack frames use sys.setrecursionlimit as follows:
 
 .. code-block:: python3
 
     import sys
     sys.setrecursionlimit(5000)
 
-3.  Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
+lack of tail call optimization or elimination
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Where Python sets a hard limit on the number of recursive calls a function can make, the interpreters or run-time engines of some other languages perform a technique called tail call optimization or tail call elimination.  Python's strategy in this context is to keep stack frames intact and unadulterated, which facilitates debugging: recursive stack traces still look like normal, Python stack traces.
 
 
 Summary
