@@ -65,7 +65,7 @@ Required Reading
 
 * Context Managers
 
-  | `https://docs.python.org/3/library/stdtypes.html#typecontextmanager https://docs.python.org/3/library/stdtypes.html#typecontextmanager>`_
+  | `https://docs.python.org/3/library/stdtypes.html#typecontextmanager <https://docs.python.org/3/library/stdtypes.html#typecontextmanager>`_
   | https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
 .. * Multiple Dispatch & Multimethods
@@ -421,39 +421,92 @@ And the traceback is a full traceback object.  Traceback objects hold all the in
 
 https://docs.python.org/3/library/traceback.html
 
-Mixing context_managers with generators
----------------------------------------
+The contextmanager decorator
+----------------------------
 
-You can put a ``yield`` inside a context manager as well.
-
-here is a generator function that gives yields all the files in a directory:
+Similar to writing iterable classes, there's a fair bit of bookkeeping involved.  It turns out you can take advantage of generator functions to do that bookkeeping for you.  The ``contextlib.contextmanager`` decorator will turn a generator function into context manager.  Consider this code:
 
 .. code-block:: python
 
-import pathlib
+    from contextlib import contextmanager
 
-def file_yielder(dir=".", pattern="*"):
-"""
-iterate over all the files that match the pattern
+    @contextmanager
+    def context(boolean):
+        print("__init__ code here")
+        try:
+            print("__enter__ code goes here")
+            yield object()
+        except Exception as e:
+            print("errors handled here")
+            if not boolean:
+                raise e
+        finally:
+            print("__exit__ cleanup goes here")
 
-pattern us a "glob" pattern, like: *.py
-"""
-for filename in pathlib.Path(dir).glob(pattern):
-with open(filename) as file_obj:
-yield file_obj
+The code is similar to the class defined previously and using it has similar results.  We can handle errors.
+
+.. code-block:: ipython
+
+    In [96]: with context(True):
+       ....:     print("in the context")
+       ....:     raise RuntimeError("error raised")
+       ....:
+    __init__ code here
+    __enter__ code goes here
+    in the context
+    errors handled here
+    __exit__ cleanup goes here
+
+Or, we can allow them to propagate:
+
+.. code-block:: ipython
+
+    In [51]: with context(False):
+       ....: print("in the context")
+       ....: raise RuntimeError("error raised")
+    __init__ code here
+    __enter__ code goes here
+    in the context
+    errors handled here
+    __exit__ cleanup goes here
+    ---------------------------------------------------------------------------
+    RuntimeError                              Traceback (most recent call last)
+    <ipython-input-51-641528ffa695> in <module>()
+          1 with context(False):
+          2     print "in the context"
+    ----> 3     raise RuntimeError("error raised")
+          4
+    RuntimeError: error raised
+
+Mixing context_managers with generators
+---------------------------------------
+
+You can put a ``yield`` inside a context manager as well.  Here is a generator function that gives yields all the files in a directory.
+
+.. code-block:: python
+
+    import pathlib
+
+    def file_yielder(dir=".", pattern="*"):
+        """
+        iterate over all the files that match the pattern
+
+        pattern us a "glob" pattern, like: *.py
+        """
+        for filename in pathlib.Path(dir).glob(pattern):
+            with open(filename) as file_obj:
+                yield file_obj
 
 :download:`file_yielder.py <../examples/context_managers/file_yielder.py>`
 
-So the ``yield`` is inside the file context manager, so that state will be preserved while the file object is in use.
-
-This generator can be used like so:
+The ``yield`` is inside the file context manager, so that state will be preserved while the file object is in use.  This generator can be used as follows.
 
 .. code-block:: ipython
 
     In [20]: for f in file_yielder(pattern="*.py"):
-        print("The first line of: {} is:\n{}".format(f.name, f.readline()))
+        ...:     print("The first line of: {} is:\n{}".format(f.name, f.readline()))
 
-Each iteration through the loop, the previous file gets closed, and the new one opened. If there is an exception raised inside that loop, the last file will get properly closed.
+In each iteration through the loop the previous file gets closed and the new one opened.  If there is an exception raised inside the loop, the last file will get properly closed.
 
 
 .. Multiple Dispatch & Multimethods
