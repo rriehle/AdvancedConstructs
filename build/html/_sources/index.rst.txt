@@ -50,8 +50,8 @@ New Words or Concepts
 * Decorator
 * Context Manager
 * Contextlib
-* Multiple Dispatch
-* Multimethods
+.. * Multiple Dispatch
+.. * Multimethods
 * Recursion
 
 
@@ -67,11 +67,11 @@ Required Reading
   | `https://docs.python.org/3/library/stdtypes.html#typecontextmanager <https://docs.python.org/3/library/stdtypes.html#typecontextmanager>`_
   | https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
-* Multiple Dispatch & Multimethods
+.. * Multiple Dispatch & Multimethods
 
-  | Five-minute Multimethods in Python by Guido van van Rossum
-  | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
-  | https://en.wikipedia.org/wiki/Multiple_dispatch
+..   | Five-minute Multimethods in Python by Guido van van Rossum
+..   | https://www.artima.com/weblogs/viewpost.jsp?thread=101605
+..   | https://en.wikipedia.org/wiki/Multiple_dispatch
 
 * Recursion
 
@@ -511,8 +511,8 @@ The ``yield`` is inside the file context manager, so that state will be preserve
 In each iteration through the loop the previous file gets closed and the new one opened.  If there is an exception raised inside the loop, the last file will get properly closed.
 
 
-Multiple Dispatch & Multimethods
-================================
+.. Multiple Dispatch & Multimethods
+.. ================================
 
 .. https://canvas.uw.edu/courses/1212062/pages/lesson-02-dot-02-currying?module_item_id=8222029
 .. https://www.artima.com/forums/flat.jsp?forum=106&thread=101605
