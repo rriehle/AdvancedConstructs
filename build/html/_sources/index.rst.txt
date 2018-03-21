@@ -421,7 +421,6 @@ And the traceback is a full traceback object.  Traceback objects hold all the in
 
 https://docs.python.org/3/library/traceback.html
 
-<<<<<<< HEAD
 The contextmanager decorator
 ----------------------------
 
@@ -479,8 +478,6 @@ Or, we can allow them to propagate:
           4
     RuntimeError: error raised
 
-=======
->>>>>>> rriehle
 Mixing context_managers with generators
 ---------------------------------------
 

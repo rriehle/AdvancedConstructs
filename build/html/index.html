@@ -55,6 +55,8 @@
 <li><a class="reference internal" href="#context-manager">Context Manager</a><ul>
 <li><a class="reference internal" href="#contextlib">contextlib</a></li>
 <li><a class="reference internal" href="#enter-and-exit">Enter and exit</a></li>
+<li><a class="reference internal" href="#the-contextmanager-decorator">The contextmanager decorator</a></li>
+<li><a class="reference internal" href="#mixing-context-managers-with-generators">Mixing context_managers with generators</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#recursion">Recursion</a><ul>
@@ -444,9 +446,9 @@ clarify the order in which things happen:</p>
 <p>The value is the exception object itself.</p>
 <p>And the traceback is a full traceback object.  Traceback objects hold all the information about the context in which and error occurred.  It’s pretty advanced stuff, so you can mostly ignore it, but if you want to know more, there are tools for working with them in the <code class="docutils literal"><span class="pre">traceback</span></code> module.</p>
 <p><a class="reference external" href="https://docs.python.org/3/library/traceback.html">https://docs.python.org/3/library/traceback.html</a></p>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-The contextmanager decorator
-—————————-</p>
+</div>
+<div class="section" id="the-contextmanager-decorator">
+<h4>The contextmanager decorator<a class="headerlink" href="#the-contextmanager-decorator" title="Permalink to this headline">¶</a></h4>
 <p>Similar to writing iterable classes, there’s a fair bit of bookkeeping involved.  It turns out you can take advantage of generator functions to do that bookkeeping for you.  The <code class="docutils literal"><span class="pre">contextlib.contextmanager</span></code> decorator will turn a generator function into context manager.  Consider this code:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 
@@ -495,7 +497,9 @@ The contextmanager decorator
 <span class="ne">RuntimeError</span>: error raised
 </pre></div>
 </div>
-<hr class="docutils" />
+</div>
+<div class="section" id="mixing-context-managers-with-generators">
+<h4>Mixing context_managers with generators<a class="headerlink" href="#mixing-context-managers-with-generators" title="Permalink to this headline">¶</a></h4>
 <p>You can put a <code class="docutils literal"><span class="pre">yield</span></code> inside a context manager as well.  Here is a generator function that gives yields all the files in a directory.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pathlib</span>
 
