@@ -50,9 +50,10 @@ New Words or Concepts
 * Decorator
 * Context Manager
 * Contextlib
+* Recursion
+
 .. * Multiple Dispatch
 .. * Multimethods
-* Recursion
 
 
 Required Reading
@@ -477,7 +478,6 @@ Recursion is where a function or method calls itself, either directly or indirec
 Recursive algorithms naturally fit certain problems, particularly problems amenable to divide and conquer solutions.  The general form is when a solution can be divided into an operation on the first member of a collection combined with the same operation on the remaining members of the collection.
 
 A key element to a recursive solution involves the specification of a termination condition.  The algorithm needs to know when to end, when to stop calling itself.  Typically this is when all of the members of the collection have been processed.
-
 
 Recursion Limitations
 ---------------------
